@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <head>
+        <title>Stopwatch</title>
+        <style>
+            body {
+                font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+                background-color: black;
+                color: white;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+            }
+            h1 {
+                margin-bottom: 20px;
+            }
+            .stopwatch-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background-color: black;
+                padding: 40px;
+                border-radius: 15px;
+                box-shadow: 0 0 20px white;
+            }
+            .time {
+                font-size: 60px;
+                margin-bottom: 20px;
+            }
+            .controls {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                gap: 10px;
+            }
+            button {
+                background-color: white;
+                color: black;
+                font-size: 20px;
+                border: 5px;
+                border-style:double;
+                border: color-mix(in xyz, color percentage, color percentage);
+                padding: 10px 20px;
+                border-radius: 10px;
+                cursor: pointer;
+                width: 30%;
+                text-align: center;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            button:disabled {
+                background-color: white;
+                cursor: pointer;
+            }
+            .laps {
+                margin-top: 20px;
+                width: 100%;
+                max-width: 300px;
+                text-align: left;
+            }
+            .lap {
+                background-color: #333;
+                padding: 5px;
+                margin: 5px 0;
+                border-radius: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Stopwatch</h1>
+    <div class="stopwatch-container">
+        <div class="time" id="time">00:00:00</div>
+        <div class="controls">
+            <button id="startStop" onclick="startStop()">Start</button>
+            <button id="reset" onclick="reset()">Reset</button>
+            <button id="lap" onclick="recordLap()" disabled>Lap</button>
+        </div>
+        <div class="laps" id="laps"></div>
+    </div>
+
+    <script>
+        let timerInterval;
+        let isRunning = false;
+        let seconds = 0;
+        let minutes = 0;
+        let hours = 0;
+        let laps = [];
+
+        function startStop() {
+            if (isRunning) {
+                clearInterval(timerInterval);
+                document.getElementById('startStop').innerText = 'Start';
+            } else {
+                timerInterval = setInterval(updateTime, 1000);
+                document.getElementById('startStop').innerText = 'Stop';
+            }
+            isRunning = !isRunning;
+            document.getElementById('lap').disabled = !isRunning;
+        }
+
+        function updateTime() {
+            seconds++;
+            if (seconds >= 60) {
+                seconds = 0;
+                minutes++;
+            }
+            if (minutes >= 60) {
+                minutes = 0;
+                hours++;
+            }
+            document.getElementById('time').innerText = formatTime(hours, minutes, seconds);
+        }
+
+        function formatTime(hours, minutes, seconds) {
+            return `${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
+        }
+
+        function padZero(value) {
+            return value < 10 ? `0${value}` : value;
+        }
+
+        function reset() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            seconds = 0;
+            minutes = 0;
+            hours = 0;
+            document.getElementById('time').innerText = formatTime(hours, minutes, seconds);
+            document.getElementById('startStop').innerText = 'Start';
+            document.getElementById('reset').disabled = true;
+            document.getElementById('lap').disabled = true;
+            laps = [];
+            document.getElementById('laps').innerHTML = '';
+        }
+
+        function recordLap() {
+            const lapTime = formatTime(hours, minutes, seconds);
+            laps.push(lapTime);
+            displayLaps();
+        }
+
+        function displayLaps() {
+            let lapHTML = '';
+            laps.forEach((lap, index) => {
+                lapHTML += `<div class="lap">Lap ${index + 1}: ${lap}</div>`;
+            });
+            document.getElementById('laps').innerHTML = lapHTML;
+        }
+    </script>
+    </body>
+</html>
